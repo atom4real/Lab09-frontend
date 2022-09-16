@@ -1,58 +1,65 @@
 <template>
   <div>
-    <h1>Create an event</h1>
-    <form @submit.prevent="saveEvent">
-      <BaseInput v-model="event.category" type="text" label="Category" />
-      <h3>Name & describe your event</h3>
-
-      <label>Title</label>
-      <BaseInput v-model="event.title" type="text" label="Titel" />
-
-      <label>Description</label>
+    <h1>Add Organizer's Profile</h1>
+    <form @submit.prevent="saveOrganizer">
+      <label>ID</label>
       <input
-        v-model="event.description"
+        v-model="organizer.id"
         type="text"
-        placeholder="Description"
+        placeholder="ID"
         class="field"
       />
 
-      <h3>Where is your event?</h3>
-
-      <label>Location</label>
+      <label>Name</label>
       <input
-        v-model="event.location"
+        v-model="organizer.organizerName"
         type="text"
-        placeholder="Location"
+        placeholder="Name"
         class="field"
       />
+
+      <label>Address</label>
+      <input
+        v-model="organizer.address"
+        type="text"
+        placeholder="Address"
+        class="field"
+      />
+
       <button type="submit">Submit</button>
     </form>
 
-    <pre>{{ event }}</pre>
+    <pre>{{ organizer }}</pre>
   </div>
 </template>
 <script>
-import EventService from '@/services/EventService.js'
+import EventService from '@/services/EventService'
 export default {
+  inject: ['GStore'],
   data() {
     return {
-      event: {
-        category: '',
-        title: '',
-        description: '',
-        location: ''
+      organizer: {
+        id: '',
+        organizerName: '',
+        address: ''
       }
     }
   },
   methods: {
-    saveEvent() {
-      EventService.saveEvent(this.event)
-        .then((response) => {
-          console.log(response)
+    saveOrganizer() {
+      EventService.saveOrganizer(this.organizer)
+        .then((res) => {
+          console.log(res)
           this.$router.push({
-            name: 'EventLayout',
-            params: { id: response.data.id }
+            name: 'EventList'
           })
+          this.GStore.flashMessage =
+            'You are successfully add a new event for ' +
+            res.data.organizerName +
+            "'s Profile"
+          setTimeout(() => {
+            this.GStore.flashMessage = ''
+          }, 3000)
         })
         .catch(() => {
           this.$router.push('NetworkError')
